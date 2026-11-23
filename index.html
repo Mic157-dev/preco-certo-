@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#f5f7f4">
+    <meta name="description" content="Calcule o preço de venda de peças impressas em 3D considerando material, energia, máquina, mão de obra e taxas.">
+    <title>Preço Certo — Precificação para impressão 3D</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+    <script src="./script.js" defer></script>
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="#" aria-label="Preço Certo, início">
+            <span class="brand-mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M4 17.5 9.2 12l3.5 3.2L20 7.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M14.8 7.5H20v5.2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+            <span>preço<span class="brand-light">certo</span></span>
+        </a>
+        <span class="topbar-label"><span class="status-dot"></span> Ferramenta para empreender</span>
+    </header>
+
+    <main>
+        <section class="intro" aria-labelledby="page-title">
+            <p class="eyebrow"><span class="eyebrow-line"></span> EMPREENDEDORISMO NA PRÁTICA</p>
+            <h1 id="page-title">Seu trabalho tem valor.<br><span>Seu preço também.</span></h1>
+            <p class="intro-copy">Calcule o preço de cada peça considerando material, energia, máquina, mão de obra e outros custos da impressão.</p>
+        </section>
+
+        <nav class="wizard-progress" id="wizard-progress" aria-label="Etapas da precificação">
+            <div class="wizard-progress-heading">
+                <p class="section-kicker" id="wizard-step-count">ETAPA 1 DE 5</p>
+                <h2 id="wizard-step-title">Material</h2>
+            </div>
+            <div class="wizard-progress-track" id="wizard-progress-track" role="progressbar" aria-label="Progresso da precificação" aria-valuemin="1" aria-valuemax="5" aria-valuenow="1">
+                <span id="wizard-progress-fill"></span>
+            </div>
+            <ol class="wizard-step-list">
+                <li class="is-current" data-wizard-indicator="0" aria-current="step"><span>1</span>Material</li>
+                <li data-wizard-indicator="1"><span>2</span>Impressora</li>
+                <li data-wizard-indicator="2"><span>3</span>Operação</li>
+                <li data-wizard-indicator="3"><span>4</span>Venda</li>
+                <li data-wizard-indicator="4"><span>5</span>Resultado</li>
+            </ol>
+        </nav>
+
+        <section class="workspace wizard-workspace" id="wizard-workspace" aria-label="Calculadora de preço de venda">
+            <form class="calculator card" id="pricing-form" novalidate>
+                <div class="card-heading">
+                    <div>
+                        <p class="section-kicker">SIMULE</p>
+                        <h2>Custos da impressão 3D</h2>
+                    </div>
+                    <span class="heading-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <rect x="5" y="3" width="14" height="18" rx="2.5" stroke="currentColor" stroke-width="1.7"/>
+                            <path d="M8.5 7h7M8.5 11h2m3 0h2m-7 3.5h2m3 0h2m-7 3.5h2m3 0h2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                </div>
+
+                <datalist id="material-suggestions">
+                    <option value="PLA" data-price-per-kg="109.00" data-price-note="Preço anunciado para bobina de 1 kg; referência de 19/11/2026." data-price-source="https://3dbrothers.com.br/produtos/filamento-3d-pla-premium-175-mm-branco-1tlzn/">
+                    <option value="PLA+" data-price-per-kg="109.00" data-price-note="Estimativa baseada em PLA comum; preço específico varia por marca." data-price-source="https://3dbrothers.com.br/produtos/filamento-3d-pla-premium-175-mm-branco-1tlzn/">
+                    <option value="PLA Tough" data-price-per-kg="219.90" data-price-note="Proxy baseado em PLA Pro; referência editável." data-price-source="https://www.3dcolors.com.br/produtos/polylite-pla-pro/">
+                    <option value="PLA High-Speed" data-price-per-kg="120.00" data-price-note="Preço anunciado para bobina de 1 kg; referência de 19/11/2026." data-price-source="https://3dbrothers.com.br/produtos/filamento-3d-pla-hs-black-175mm-1kg-1sv7o/">
+                    <option value="PLA com fibra de carbono" data-price-per-kg="299.90" data-price-note="Preço anunciado para PLA-CF de 1 kg; referência de 19/11/2026." data-price-source="https://www.3dcolors.com.br/produtos/polylite-pla-cf/">
+                    <option value="PLA com madeira" data-price-per-kg="299.90" data-price-note="Proxy baseado em PLA-CF; confirme o preço do composto específico." data-price-source="https://www.3dcolors.com.br/produtos/polylite-pla-cf/">
+                    <option value="PLA com metal" data-price-per-kg="299.90" data-price-note="Proxy baseado em PLA-CF; confirme o preço do composto específico." data-price-source="https://www.3dcolors.com.br/produtos/polylite-pla-cf/">
+                    <option value="PLA com carga cerâmica" data-price-per-kg="299.90" data-price-note="Proxy baseado em PLA-CF; confirme o preço do composto específico." data-price-source="https://www.3dcolors.com.br/produtos/polylite-pla-cf/">
+                    <option value="PETG" data-price-per-kg="106.67" data-price-note="Preço anunciado para bobina de 1 kg; referência de 19/11/2026." data-price-source="https://3dbrothers.com.br/produtos/filamento-3d-petg-premium-1kg-175-mm-preto-al7at/">
+                    <option value="PET" data-price-per-kg="106.67" data-price-note="Proxy baseado em PETG; referência editável." data-price-source="https://3dbrothers.com.br/produtos/filamento-3d-petg-premium-1kg-175-mm-preto-al7at/">
+                    <option value="PETG com fibra de carbono" data-price-per-kg="300.00" data-price-note="Preço anunciado para bobina PETG-CF de 1 kg; referência de 19/11/2026." data-price-source="https://www.loja3dxfilamentos.com.br/filamento-sunlu-petg-cf-1kg-175-fibra-de-carbono">
+                    <option value="ABS" data-price-per-kg="96.00" data-price-note="Preço anunciado para bobina de 1 kg; referência de 19/11/2026." data-price-source="https://3dbrothers.com.br/produtos/filamento-3d-abs-premium-1kg-175-mm-preto/">
+                    <option value="ABS com fibra de carbono" data-price-per-kg="300.00" data-price-note="Proxy baseado em PETG-CF; confirme o preço do ABS-CF específico." data-price-source="https://www.loja3dxfilamentos.com.br/filamento-sunlu-petg-cf-1kg-175-fibra-de-carbono">
+                    <option value="ASA" data-price-per-kg="200.00" data-price-note="Preço anunciado para bobina de 1 kg; referência de 19/11/2026." data-price-source="https://www.loja3dxfilamentos.com.br/filamento-sunlu-asa-1kg-175-laranja">
+                    <option value="TPU" data-price-per-kg="439.87" data-price-note="Preço de R$ 329,90 por 750 g, normalizado para kg; referência de 19/11/2026." data-price-source="https://www.3dcolors.com.br/produtos/polyflex-tpu95/">
+                    <option value="TPE" data-price-per-kg="439.87" data-price-note="Proxy baseado em TPU 95A; preço específico de TPE pode variar." data-price-source="https://www.3dcolors.com.br/produtos/polyflex-tpu95/">
+                    <option value="Nylon (PA)" data-price-per-kg="280.00" data-price-note="Proxy baseado em PA6/Nylon de 1 kg; referência de 19/11/2026." data-price-source="https://www.loja3dxfilamentos.com.br/produto/filamento-pa6-175-1-kg-branco-nylon-nth.html">
+                    <option value="PA6" data-price-per-kg="280.00" data-price-note="Preço anunciado para PA6/Nylon de 1 kg; referência de 19/11/2026." data-price-source="https://www.loja3dxfilamentos.com.br/produto/filamento-pa6-175-1-kg-branco-nylon-nth.html">
+                    <option value="PA11" data-price-per-kg="280.00" data-price-note="Proxy baseado em PA6/Nylon; preço específico de PA11 pode variar." data-price-source="https://www.loja3dxfilamentos.com.br/produto/filamento-pa6-175-1-kg-branco-nylon-nth.html">
+                    <option value="PA12" data-price-per-kg="450.00" data-price-note="Preço anunciado para bobina PA12 de 1 kg; referência de 19/11/2026." data-price-source="https://www.loja3dxfilamentos.com.br/produto/filamento-pa12-1kg-175-natural-nth.html">
+                    <option value="PA com fibra de carbono" data-price-per-kg="800.00" data-price-note="Proxy baseado em PA6-CF de 1 kg; referência de 19/11/2026." data-price-source="https://www.loja3dxfilamentos.com.br/filamento-sunlu-pa6-ht-cf-15-1kg-175-preto-fibra-de-carbono">
+                    <option value="PA com fibra de vidro" data-price-per-kg="700.00" data-price-note="Proxy baseado em PA6-GF de 1 kg; referência de 19/11/2026." data-price-source="https://www.loja3dxfilamentos.com.br/filamento-sunlu-pa6-ht-gf-15-1kg-175-preto-fibra-de-vidro">
+                    <option value="PC" data-price-per-kg="300.00" data-price-note="Preço anunciado para bobina de policarbonato de 1 kg; referência de 19/11/2026." data-price-source="https://www.loja3dxfilamentos.com.br/filamento-zarpar-pc-1kg-175-preto-policarbonato">
+                    <option value="PC-ABS" data-price-per-kg="599.90" data-price-note="Preço anunciado para PC-ABS de 1 kg; referência de 19/11/2026." data-price-source="https://www.3dcolors.com.br/produtos/polymaker-pc-abs/">
+                    <option value="PP" data-price-per-kg="106.67" data-price-note="Proxy baseado em PETG de 1 kg; produto de PP não estava disponível." data-price-source="https://3dbrothers.com.br/produtos/filamento-3d-petg-premium-1kg-175-mm-preto-al7at/">
+                    <option value="POM" data-price-per-kg="300.00" data-price-note="Proxy de polímero de engenharia baseado em PC; confirme o preço específico." data-price-source="https://www.loja3dxfilamentos.com.br/filamento-zarpar-pc-1kg-175-preto-policarbonato">
+                    <option value="PVA" data-price-per-kg="188.00" data-price-note="Proxy baseado em HIPS/PSAI solúvel; PVA estava indisponível." data-price-source="https://www.loja3dxfilamentos.com.br/filamento-ps-ai-500g-175-preto-hips-soluvel">
+                    <option value="BVOH" data-price-per-kg="188.00" data-price-note="Proxy baseado em HIPS/PSAI solúvel; confirme o preço do BVOH." data-price-source="https://www.loja3dxfilamentos.com.br/filamento-ps-ai-500g-175-preto-hips-soluvel">
+                    <option value="HIPS" data-price-per-kg="188.00" data-price-note="Preço de R$ 94 por 500 g, normalizado para kg; referência de 19/11/2026." data-price-source="https://www.loja3dxfilamentos.com.br/filamento-ps-ai-500g-175-preto-hips-soluvel">
+                    <option value="CPE" data-price-per-kg="106.67" data-price-note="Proxy baseado em PETG/copoliéster de 1 kg; referência editável." data-price-source="https://3dbrothers.com.br/produtos/filamento-3d-petg-premium-1kg-175-mm-preto-al7at/">
+                    <option value="CPE+" data-price-per-kg="106.67" data-price-note="Proxy baseado em PETG/copoliéster de 1 kg; referência editável." data-price-source="https://3dbrothers.com.br/produtos/filamento-3d-petg-premium-1kg-175-mm-preto-al7at/">
+                    <option value="PVB" data-price-per-kg="106.67" data-price-note="Proxy baseado em PETG de 1 kg; confirme o preço do PVB." data-price-source="https://3dbrothers.com.br/produtos/filamento-3d-petg-premium-1kg-175-mm-preto-al7at/">
+                    <option value="PMMA" data-price-per-kg="300.00" data-price-note="Proxy de polímero transparente baseado em PC de 1 kg." data-price-source="https://www.loja3dxfilamentos.com.br/filamento-zarpar-pc-1kg-175-preto-policarbonato">
+                    <option value="PEI (Ultem)" data-price-per-kg="800.00" data-price-note="Proxy de polímero de alta temperatura baseado em PA6-CF; confirme com fornecedor." data-price-source="https://www.loja3dxfilamentos.com.br/filamento-sunlu-pa6-ht-cf-15-1kg-175-preto-fibra-de-carbono">
+                    <option value="PEEK" data-price-per-kg="800.00" data-price-note="Proxy de polímero de engenharia baseado em PA6-CF; PEEK estava indisponível." data-price-source="https://www.loja3dxfilamentos.com.br/filamento-sunlu-pa6-ht-cf-15-1kg-175-preto-fibra-de-carbono">
+                    <option value="PEKK" data-price-per-kg="800.00" data-price-note="Proxy de polímero de engenharia baseado em PA6-CF; confirme com fornecedor." data-price-source="https://www.loja3dxfilamentos.com.br/filamento-sunlu-pa6-ht-cf-15-1kg-175-preto-fibra-de-carbono">
+                    <option value="PPS" data-price-per-kg="800.00" data-price-note="Proxy de polímero de engenharia baseado em PA6-CF; confirme com fornecedor." data-price-source="https://www.loja3dxfilamentos.com.br/filamento-sunlu-pa6-ht-cf-15-1kg-175-preto-fibra-de-carbono">
+                    <option value="PPSU" data-price-per-kg="800.00" data-price-note="Proxy de polímero de engenharia baseado em PA6-CF; confirme com fornecedor." data-price-source="https://www.loja3dxfilamentos.com.br/filamento-sunlu-pa6-ht-cf-15-1kg-175-preto-fibra-de-carbono">
+                    <option value="PVDF" data-price-per-kg="800.00" data-price-note="Proxy de polímero de engenharia baseado em PA6-CF; confirme com fornecedor." data-price-source="https://www.loja3dxfilamentos.com.br/filamento-sunlu-pa6-ht-cf-15-1kg-175-preto-fibra-de-carbono">
+                    <option value="Filamento condutivo" data-price-per-kg="299.90" data-price-note="Proxy baseado em PLA-CF; material condutivo específico pode ter outro preço." data-price-source="https://www.3dcolors.com.br/produtos/polylite-pla-cf/">
+                    <option value="Filamento fluorescente" data-price-per-kg="109.00" data-price-note="Proxy baseado em PLA comum; preço de filamento Glow não verificado." data-price-source="https://3dbrothers.com.br/produtos/filamento-3d-pla-premium-175-mm-branco-1tlzn/">
+                    <option value="Resina UV padrão" data-price-per-kg="80.00" data-price-note="Estimativa baseada no valor-base de resina previamente definido; confirme o fornecedor.">
+                    <option value="Resina ABS-like" data-price-per-kg="80.00" data-price-note="Estimativa baseada no valor-base de resina previamente definido; confirme o fornecedor.">
+                    <option value="Resina tough" data-price-per-kg="80.00" data-price-note="Estimativa baseada no valor-base de resina previamente definido; confirme o fornecedor.">
+                    <option value="Resina flexível" data-price-per-kg="80.00" data-price-note="Estimativa baseada no valor-base de resina previamente definido; confirme o fornecedor.">
+                    <option value="Resina lavável em água" data-price-per-kg="80.00" data-price-note="Estimativa baseada no valor-base de resina previamente definido; confirme o fornecedor.">
+                    <option value="Resina de alta temperatura" data-price-per-kg="80.00" data-price-note="Estimativa baseada no valor-base de resina previamente definido; confirme o fornecedor.">
+                    <option value="Resina odontológica" data-price-per-kg="80.00" data-price-note="Estimativa baseada no valor-base de resina previamente definido; confirme o fornecedor.">
+                    <option value="Resina biocompatível" data-price-per-kg="80.00" data-price-note="Estimativa baseada no valor-base de resina previamente definido; confirme o fornecedor.">
+                    <option value="Resina calcinável" data-price-per-kg="80.00" data-price-note="Estimativa baseada no valor-base de resina previamente definido; confirme o fornecedor.">
+                    <option value="Resina transparente" data-price-per-kg="80.00" data-price-note="Estimativa baseada no valor-base de resina previamente definido; confirme o fornecedor.">
+                    <option value="Resina com carga cerâmica" data-price-per-kg="80.00" data-price-note="Estimativa baseada no valor-base de resina previamente definido; confirme o fornecedor.">
+                    <option value="Pó de PA11" data-price-per-kg="280.00" data-price-note="Proxy baseado em PA6/Nylon de 1 kg; preço de pó SLS não foi publicado." data-price-source="https://www.loja3dxfilamentos.com.br/produto/filamento-pa6-175-1-kg-branco-nylon-nth.html">
+                    <option value="Pó de PA12" data-price-per-kg="450.00" data-price-note="Proxy baseado em PA12 de 1 kg; preço de pó SLS não foi publicado." data-price-source="https://www.loja3dxfilamentos.com.br/produto/filamento-pa12-1kg-175-natural-nth.html">
+                    <option value="Pó de PA12 com fibra de vidro" data-price-per-kg="700.00" data-price-note="Proxy baseado em PA6-GF de 1 kg; preço de pó SLS não foi publicado." data-price-source="https://www.loja3dxfilamentos.com.br/filamento-sunlu-pa6-ht-gf-15-1kg-175-preto-fibra-de-vidro">
+                    <option value="Pó de TPU" data-price-per-kg="439.87" data-price-note="Proxy baseado em TPU95 de 750 g, normalizado; preço de pó SLS não foi publicado." data-price-source="https://www.3dcolors.com.br/produtos/polyflex-tpu95/">
+                    <option value="Pó de PP" data-price-per-kg="106.67" data-price-note="Proxy baseado em PETG de 1 kg; preço de pó SLS não foi publicado." data-price-source="https://3dbrothers.com.br/produtos/filamento-3d-petg-premium-1kg-175-mm-preto-al7at/">
+                    <option value="Alumide" data-price-per-kg="450.00" data-price-note="Proxy baseado em PA12 de 1 kg; preço de Alumide não foi publicado." data-price-source="https://www.loja3dxfilamentos.com.br/produto/filamento-pa12-1kg-175-natural-nth.html">
+                </datalist>
+
+                <fieldset class="cost-group wizard-panel" data-wizard-step="0" tabindex="-1">
+                    <legend><span>1</span> Material</legend>
+                    <label class="field product-field" for="material-name">
+                        <span class="field-label">Nome do material</span>
+                        <div class="input-wrap material-name-wrap">
+                            <input id="material-name" name="materialName" type="text" maxlength="60" placeholder="Ex.: PLA, resina UV, PA12" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="material-picker-list">
+                            <button class="material-picker-button" id="material-picker-button" type="button" aria-label="Abrir lista de materiais" aria-expanded="false" aria-controls="material-picker-list" title="Abrir lista de materiais">
+                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                    <path d="m7 10 5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                            <div class="material-picker-list" id="material-picker-list" role="listbox" aria-label="Materiais cadastrados" hidden></div>
+                        </div>
+                    </label>
+                    <div class="form-grid">
+                        <div class="field">
+                            <span class="field-label">Preço calculado por kg</span>
+                            <strong class="calculated-material-price" id="material-price-per-kg" aria-live="polite">Selecione um material</strong>
+                            <span class="field-hint" id="material-price-hint">Selecione um material cadastrado para carregar seu preço de referência.</span>
+                            <a class="field-hint" id="material-price-source" href="#" target="_blank" rel="noopener noreferrer" hidden>Ver referência do preço</a>
+                        </div>
+                        <label class="field" for="material-amount-kg">
+                            <span class="field-label">Material usado na peça (kg)</span>
+                            <span class="input-wrap">
+                                <input class="unit-input" id="material-amount-kg" name="materialAmountKg" type="number" min="0" step="0.1" value="1.00" inputmode="decimal">
+                                <span class="input-suffix">kg</span>
+                            </span>
+                        </label>
+                        <label class="field" for="material-amount-g">
+                            <span class="field-label">Material usado na peça (g)</span>
+                            <span class="input-wrap">
+                                <input class="unit-input" id="material-amount-g" name="materialAmountGrams" type="number" min="0" step="10" value="0" inputmode="numeric">
+                                <span class="input-suffix">g</span>
+                            </span>
+                            <span class="field-hint">Os valores em kg e g são somados. Ao atingir 1.000 g, o valor passa para kg.</span>
+                        </label>
+                        <div class="field field-wide">
+                            <span class="field-label">Preço final de venda por peça</span>
+                            <strong class="calculated-material-price" id="material-final-price" aria-live="polite">—</strong>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="cost-group wizard-panel" data-wizard-step="1" tabindex="-1" hidden>
+                    <legend><span>2</span> Impressora e manutenção</legend>
+                    <div class="form-grid">
+                        <label class="field" for="printer-type">
+                            <span class="field-label">Tipo de impressora</span>
+                            <select id="printer-type" name="printerType" required>
+                                <option value="fdm">Impressora de filamento</option>
+                                <option value="sla-msla">Impressora de resina</option>
+                                <option value="sls">Impressora de pó</option>
+                            </select>
+                            <span class="field-hint">Selecione a tecnologia da impressora</span>
+                        </label>
+                        <label class="field" for="printer-power">
+                            <span class="field-label">Potência média da impressora</span>
+                            <span class="input-wrap">
+                                <input class="unit-input" id="printer-power" name="printerPower" type="number" min="0" step="1" value="120" inputmode="decimal" required>
+                                <span class="input-suffix" id="printer-power-unit">W</span>
+                            </span>
+                            <span class="field-hint" id="printer-energy-per-hour">Consumo por hora: 0,12 kWh</span>
+                        </label>
+                        <div class="field time-field">
+                            <span class="field-label">Tempo de impressão</span>
+                            <div class="time-inputs">
+                                <label class="input-wrap" for="print-hours">
+                                    <span class="sr-only">Horas de impressão</span>
+                                    <input class="unit-input" id="print-hours" name="printHours" type="number" min="0" step="1" value="2" inputmode="numeric" required>
+                                    <span class="input-suffix">h</span>
+                                </label>
+                                <label class="input-wrap" for="print-minutes">
+                                    <span class="sr-only">Minutos de impressão</span>
+                                    <input class="unit-input" id="print-minutes" name="printMinutes" type="number" min="0" step="1" value="0" inputmode="numeric" required>
+                                    <span class="input-suffix">min</span>
+                                </label>
+                            </div>
+                            <span class="field-hint">Ao chegar a 60 min, soma 1 h automaticamente</span>
+                        </div>
+                        <label class="field" for="electricity-rate">
+                            <span class="field-label">Tarifa de energia</span>
+                            <span class="input-wrap">
+                                <span class="input-prefix">R$</span>
+                                <input class="currency-input" id="electricity-rate" name="electricityRate" type="number" min="0" step="0.01" value="1" inputmode="decimal" required>
+                            </span>
+                            <span class="field-hint">Valor base de R$ 1,00/kWh; ajuste à sua conta de luz</span>
+                        </label>
+                        <label class="field" for="machine-cost">
+                            <span class="field-label">Valor da impressora</span>
+                            <span class="input-wrap">
+                                <span class="input-prefix">R$</span>
+                                <input class="currency-input" id="machine-cost" name="machineCost" type="number" min="0" step="10" value="2500.00" inputmode="decimal" required>
+                            </span>
+                            <span class="field-hint">Aumento e redução pelas setas em passos de R$ 10,00</span>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="cost-group wizard-panel" data-wizard-step="2" tabindex="-1" hidden>
+                    <legend><span>3</span> Mão de obra e operação</legend>
+                    <div class="form-grid">
+                        <div class="field time-field">
+                            <span class="field-label">Pós-processamento</span>
+                            <div class="time-inputs">
+                                <label class="input-wrap" for="finishing-hours">
+                                    <span class="sr-only">Horas de pós-processamento</span>
+                                    <input class="unit-input" id="finishing-hours" name="finishingHours" type="number" min="0" step="1" value="0" inputmode="numeric" required>
+                                    <span class="input-suffix">h</span>
+                                </label>
+                                <label class="input-wrap" for="finishing-minutes">
+                                    <span class="sr-only">Minutos de pós-processamento</span>
+                                    <input class="unit-input" id="finishing-minutes" name="finishingMinutes" type="number" min="0" step="1" value="20" inputmode="numeric" required>
+                                    <span class="input-suffix">min</span>
+                                </label>
+                            </div>
+                        </div>
+                        <label class="field" for="labor-rate">
+                            <span class="field-label">Valor da sua mão de obra</span>
+                            <span class="input-wrap">
+                                <span class="input-prefix">R$</span>
+                                <input class="currency-input" id="labor-rate" name="laborRate" type="number" min="0" step="0.1" value="20" inputmode="decimal" required>
+                            </span>
+                        </label>
+                        <label class="field" for="packaging-cost">
+                            <span class="field-label">Embalagem e envio</span>
+                            <span class="input-wrap">
+                                <span class="input-prefix">R$</span>
+                                <input class="currency-input" id="packaging-cost" name="packagingCost" type="number" min="0" step="0.1" value="3.50" inputmode="decimal" required>
+                            </span>
+                        </label>
+                        <label class="field" for="monthly-expenses">
+                            <span class="field-label">Despesas fixas mensais</span>
+                            <span class="input-wrap">
+                                <span class="input-prefix">R$</span>
+                                <input class="currency-input" id="monthly-expenses" name="monthlyExpenses" type="number" min="0" step="0.1" value="250" inputmode="decimal" required>
+                            </span>
+                        </label>
+                        <label class="field" for="monthly-print-hours">
+                            <span class="field-label">Horas produtivas no mês</span>
+                            <span class="input-wrap">
+                                <input class="unit-input" id="monthly-print-hours" name="monthlyPrintHours" type="number" min="0" step="1" value="160" inputmode="numeric" readonly required>
+                                <span class="input-suffix">horas</span>
+                            </span>
+                        </label>
+                        <label class="field" for="weekly-print-hours">
+                            <span class="field-label">Horas produtivas na semana</span>
+                            <span class="input-wrap">
+                                <input class="unit-input" id="weekly-print-hours" name="weeklyPrintHours" type="number" min="0" max="44" step="1" value="40" inputmode="numeric" required>
+                                <span class="input-suffix">horas</span>
+                            </span>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="cost-group wizard-panel" data-wizard-step="3" tabindex="-1" hidden>
+                    <legend><span>4</span> Margem e venda</legend>
+                    <div class="form-grid">
+                        <label class="field" for="failure-rate">
+                            <span class="field-label">Taxa de falhas</span>
+                            <span class="input-wrap">
+                                <input class="unit-input" id="failure-rate" name="failureRate" type="number" min="0" max="99.9" step="0.1" value="5" inputmode="decimal" required>
+                                <span class="input-suffix">%</span>
+                            </span>
+                            <span class="field-hint">Reserva para peças perdidas ou defeituosas</span>
+                        </label>
+                        <label class="field" for="profit-margin">
+                            <span class="field-label">Margem de lucro desejada</span>
+                            <span class="input-wrap">
+                                <input class="unit-input" id="profit-margin" name="profitMargin" type="number" min="0" max="1000" step="0.1" value="35" inputmode="decimal" required>
+                                <span class="input-suffix">%</span>
+                            </span>
+                            <span class="field-hint">Acréscimo sobre o custo de produção</span>
+                        </label>
+                        <label class="field" for="sales-fees">
+                            <span class="field-label">Impostos e comissão de venda</span>
+                            <span class="input-wrap">
+                                <input class="unit-input" id="sales-fees" name="salesFees" type="number" min="0" max="99.9" step="0.1" value="6" inputmode="decimal" required>
+                                <span class="input-suffix">%</span>
+                            </span>
+                            <span class="field-hint">Taxas calculadas sobre o valor da venda</span>
+                        </label>
+                        <label class="field" for="quantity">
+                            <span class="field-label">Peças nesta simulação</span>
+                            <span class="input-wrap">
+                                <input class="unit-input" id="quantity" name="quantity" type="number" min="1" step="1" value="12" inputmode="numeric" required>
+                                <span class="input-suffix">peças</span>
+                            </span>
+                            <span class="field-hint">Quantidade para estimar vendas e lucro</span>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
+                <div class="wizard-navigation">
+                    <button class="wizard-back-button" id="wizard-back" type="button" hidden>Voltar</button>
+                    <button class="primary-button" id="wizard-next" type="button">Continuar</button>
+                </div>
+                <div class="form-footer">
+                    <p class="formula-note"><span aria-hidden="true">ⓘ</span> Despesas mensais são rateadas pelas horas produtivas informadas.</p>
+                    <button class="text-button" type="reset">
+                        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                            <path d="M3.3 7.2A7 7 0 1 1 3 11m.3-7v3.7H7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Limpar
+                    </button>
+                </div>
+            </form>
+
+            <aside class="results card" id="results-panel" aria-labelledby="result-title" tabindex="-1" hidden>
+                <div class="result-topline">
+                    <p class="section-kicker">SEU RESULTADO</p>
+                    <span class="live-badge"><span></span> AO VIVO</span>
+                </div>
+                <h2 id="result-title">Preço sugerido</h2>
+                <p class="result-product" id="result-product">por unidade</p>
+                <p class="price-value" id="unit-price" aria-live="polite">R$ 79,66</p>
+                <p class="price-caption">por unidade</p>
+
+                <div class="result-divider"></div>
+                <div class="summary-row">
+                    <span>Vendas na simulação</span>
+                    <strong id="total-revenue">R$ 955,92</strong>
+                </div>
+                <div class="summary-row">
+                    <span>Custos totais (com falhas)</span>
+                    <strong id="total-costs">R$ 564,00</strong>
+                </div>
+                <details class="result-breakdown">
+                    <summary>Ver composição do custo por peça</summary>
+                    <div class="breakdown-list">
+                        <div><span>Material</span><strong id="material-cost">R$ 0,00</strong></div>
+                        <div><span>Energia elétrica</span><strong id="energy-cost">R$ 0,00</strong></div>
+                        <div><span>Depreciação da máquina</span><strong id="depreciation-cost">R$ 0,00</strong></div>
+                        <div><span>Peças e manutenção</span><strong id="maintenance-cost">R$ 0,00</strong></div>
+                        <div><span>Mão de obra</span><strong id="labor-cost">R$ 0,00</strong></div>
+                        <div><span>Embalagem e envio</span><strong id="packaging-cost-result">R$ 0,00</strong></div>
+                        <div><span>Despesas fixas rateadas</span><strong id="overhead-cost">R$ 0,00</strong></div>
+                        <div><span>Reserva para falhas</span><strong id="failure-cost">R$ 0,00</strong></div>
+                        <div class="breakdown-total"><span>Custo total por peça</span><strong id="unit-cost-total">R$ 0,00</strong></div>
+                    </div>
+                </details>
+                <div class="profit-box">
+                    <div>
+                        <span>Lucro estimado</span>
+                        <small>após custos e taxas</small>
+                    </div>
+                    <strong id="total-profit">R$ 334,56</strong>
+                </div>
+                <p class="result-footnote">Estimativa por peça: material, energia, depreciação, manutenção, trabalho, embalagem e despesas rateadas. Ajuste os valores à sua realidade.</p>
+                <section class="examples-panel" aria-labelledby="examples-title">
+                    <p class="examples-kicker">EXEMPLOS PRÁTICOS</p>
+                    <h3 id="examples-title">Como chegar aos valores</h3>
+                    <ul class="examples-list">
+                        <li>
+                            <strong>Filamento</strong>
+                            <span>R$ 65 por kg. Uma peça que usa 35 g consome R$ 2,28 de material.</span>
+                        </li>
+                        <li>
+                            <strong>Resina</strong>
+                            <span>R$ 80 por kg. Uma peça que usa 35 g consome R$ 2,80 de material.</span>
+                        </li>
+                        <li>
+                            <strong>Energia</strong>
+                            <span>120 W ÷ 1.000 × 2 h × R$ 1,00/kWh = R$ 0,24.</span>
+                        </li>
+                        <li>
+                            <strong>Depreciação</strong>
+                            <span>R$ 2.500 ÷ 5.000 h × 2 h = R$ 1,00 por peça.</span>
+                        </li>
+                        <li>
+                            <strong>Pós-processamento</strong>
+                            <span>20 min ÷ 60 × R$ 20/h = R$ 6,67 de mão de obra.</span>
+                        </li>
+                    </ul>
+                    <p class="examples-note">Valores ilustrativos: substitua pelos custos do seu material e equipamento.</p>
+                </section>
+                <div class="result-actions">
+                    <button class="wizard-back-button" id="results-back" type="button">Voltar</button>
+                    <button class="primary-button" id="results-restart" type="button">Nova simulação</button>
+                </div>
+            </aside>
+        </section>
+
+        <section class="qr-section" id="qr-section" aria-labelledby="qr-title" hidden>
+            <div class="qr-copy">
+                <p class="section-kicker">COMPARTILHE</p>
+                <h2 id="qr-title">Leve o app para a sua feira.</h2>
+                <p>Digite o endereço público do app para gerar um QR Code e compartilhar a calculadora na sua feira.</p>
+                <form class="qr-form" id="qr-form">
+                    <label class="sr-only" for="app-url">Endereço público do aplicativo</label>
+                    <input id="app-url" name="appUrl" type="url" placeholder="https://seu-app.com.br" autocomplete="url" required>
+                    <button class="primary-button" type="submit">
+                        Gerar QR Code
+                        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                            <path d="M4 10h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </form>
+                <p class="qr-message" id="qr-message" role="status" aria-live="polite">Para funcionar em outros celulares, o app precisa estar publicado na internet.</p>
+            </div>
+            <div class="qr-card" aria-label="Prévia do QR Code">
+                <div class="qr-frame" id="qr-frame">
+                    <div class="qr-placeholder" id="qr-placeholder" aria-hidden="true">
+                        <svg viewBox="0 0 96 96" fill="none">
+                            <path d="M10 35V12h23M63 12h23v23M86 61v23H63M33 84H10V61" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M28 28h14v14H28zm26 0h14v14H54zM28 54h14v14H28zM54 54h6v6h-6zm14 0h-6v8h8v6h-8m-8-2v-6m14 8h6" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <img id="qr-image" alt="QR Code para abrir o aplicativo" hidden>
+                </div>
+                <a class="qr-download" id="qr-open" href="#" target="_blank" rel="noopener" hidden>Abrir imagem do QR Code</a>
+                <p class="qr-caption" id="qr-caption">Seu QR Code aparecerá aqui</p>
+                <p class="qr-privacy">A imagem do QR Code é criada online usando o endereço informado.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <span>PREÇO CERTO <span aria-hidden="true">·</span> PROJETO DE EMPREENDEDORISMO</span>
+        <span>Planeje com clareza. Venda com confiança.</span>
+    </footer>
+</body>
+</html>
