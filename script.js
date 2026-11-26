@@ -1,4 +1,17 @@
 const pricingForm = document.querySelector("#pricing-form");
+const printerTabs = Array.from(document.querySelectorAll(".printer-subtab"));
+const printerTabPanels = printerTabs.map((tab) => document.getElementById(tab.getAttribute("aria-controls")));
+const energyCalculator = document.querySelector("#energy-calculator");
+const energyInputs = Array.from(energyCalculator.querySelectorAll("input"));
+const energyDaysInput = document.querySelector("#energy-days");
+const energyHoursInput = document.querySelector("#energy-hours");
+const energyMinutesInput = document.querySelector("#energy-minutes");
+const energyFormMessage = document.querySelector("#energy-form-message");
+const energyGrossCost = document.querySelector("#energy-gross-cost");
+const energyConsumption = document.querySelector("#energy-consumption");
+const energyBaseCost = document.querySelector("#energy-base-cost");
+const energyTaxCost = document.querySelector("#energy-tax-cost");
+const energyAdditionalResult = document.querySelector("#energy-additional-result");
 const formMessage = document.querySelector("#form-message");
 const wizardWorkspace = document.querySelector("#wizard-workspace");
 const wizardPanels = Array.from(pricingForm.querySelectorAll("[data-wizard-step]"));
@@ -39,18 +52,12 @@ const qrImage = document.querySelector("#qr-image");
 const qrPlaceholder = document.querySelector("#qr-placeholder");
 const qrOpen = document.querySelector("#qr-open");
 const qrCaption = document.querySelector("#qr-caption");
-const printerPowerInput = document.querySelector("#printer-power");
-const printerPowerUnit = document.querySelector("#printer-power-unit");
-const printerEnergyPerHour = document.querySelector("#printer-energy-per-hour");
-let previousPrinterPower = Number(printerPowerInput.value);
 const machineCostInput = document.querySelector("#machine-cost");
 const laborRateInput = document.querySelector("#labor-rate");
 const packagingCostInput = document.querySelector("#packaging-cost");
 const monthlyExpensesInput = document.querySelector("#monthly-expenses");
 const monthlyPrintHoursInput = document.querySelector("#monthly-print-hours");
 const weeklyPrintHoursInput = document.querySelector("#weekly-print-hours");
-const printHoursInput = document.querySelector("#print-hours");
-const printMinutesInput = document.querySelector("#print-minutes");
 const finishingHoursInput = document.querySelector("#finishing-hours");
 const finishingMinutesInput = document.querySelector("#finishing-minutes");
 
@@ -58,11 +65,11 @@ const currency = new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL"
 });
-const energyQuantity = new Intl.NumberFormat("pt-BR", {
-    maximumFractionDigits: 3
+const preciseEnergyQuantity = new Intl.NumberFormat("pt-BR", {
+    maximumFractionDigits: 6
 });
-const machineLifetimeHours = 5000;
-const maintenanceRatePerHour = 0.5;
+let calculatedGrossEnergyCost = 0;
+let calculatedEnergyDurationHours = 0;
 
 function readAmount(id) {
     const input = document.querySelector(`#${id}`);
@@ -142,16 +149,11 @@ function updatePrice() {
         : materialAmountInKg !== null && materialUnitCost !== null
             ? currency.format(materialAmountInKg * materialUnitCost)
             : "—";
-    const printerPower = readAmount("printer-power");
-    const printerPowerInKw = printerPower === null
-        ? null
-        : printerPowerUnit.textContent === "kW"
-            ? printerPower
-            : printerPower / 1000;
-    const printHours = readAmount("print-hours");
-    const printMinutes = readAmount("print-minutes");
-    const electricityRate = readAmount("electricity-rate");
     const machineCost = readAmount("machine-cost");
+    const printerLifetimeHours = readAmount("printer-lifetime-hours");
+    const printerMaintenanceRate = readAmount("printer-maintenance-rate");
+    const printerConsumablesCost = readAmount("printer-consumables-cost");
+    const printerFixedCost = readAmount("printer-fixed-cost");
     const finishingHours = readAmount("finishing-hours");
     const finishingMinutes = readAmount("finishing-minutes");
     const laborRate = readAmount("labor-rate");
@@ -162,21 +164,21 @@ function updatePrice() {
     const failureRate = readAmount("failure-rate");
     const margin = readAmount("profit-margin");
     const salesFees = readAmount("sales-fees");
+    const platformFee = readAmount("platform-fee");
     const quantity = readAmount("quantity");
     materialPricePerKg.textContent = materialUnitCost === null
         ? "Selecione um material"
         : `${currency.format(materialUnitCost)}/kg`;
-    printerEnergyPerHour.textContent = printerPowerInKw === null
-        ? "Informe a potência para estimar o consumo por hora."
-        : `Consumo estimado por hora de impressão: ${energyQuantity.format(printerPowerInKw)} kWh`;
     const values = [
         materialUnitCost,
         materialAmountInKg,
-        printerPower,
-        printHours,
-        printMinutes,
-        electricityRate,
+        calculatedGrossEnergyCost,
+        calculatedEnergyDurationHours,
         machineCost,
+        printerLifetimeHours,
+        printerMaintenanceRate,
+        printerConsumablesCost,
+        printerFixedCost,
         finishingHours,
         finishingMinutes,
         laborRate,
@@ -187,13 +189,16 @@ function updatePrice() {
         failureRate,
         margin,
         salesFees,
+        platformFee,
         quantity
     ];
 
     if (values.some((value) => value === null)) {
         formMessage.textContent = materialUnitCost === null
             ? "Selecione um material cadastrado para carregar o preço por kg."
-            : "Confira os valores preenchidos e use números iguais ou maiores que zero.";
+            : calculatedGrossEnergyCost === null || calculatedEnergyDurationHours === null
+                ? "Corrija os valores na aba Cálculo de Energia Bruta."
+                : "Confira os valores preenchidos e use números iguais ou maiores que zero.";
         return;
     }
 
@@ -203,24 +208,32 @@ function updatePrice() {
         return;
     }
 
+    if (printerLifetimeHours === 0) {
+        formMessage.textContent = "A vida útil da impressora precisa ser maior que zero.";
+        return;
+    }
+
     if (failureRate >= 100) {
         formMessage.textContent = "A taxa de falhas precisa ser menor que 100%.";
         return;
     }
 
-    if (salesFees >= 100) {
-        formMessage.textContent = "Os impostos e comissões precisam ser menores que 100%.";
+    const totalSalesFees = salesFees + platformFee;
+    if (totalSalesFees >= 100) {
+        formMessage.textContent = "A soma dos impostos, comissões e taxa de plataforma precisa ser menor que 100%.";
         return;
     }
 
     formMessage.textContent = "";
-    const printDurationHours = printHours + printMinutes / 60;
+    const printDurationHours = calculatedEnergyDurationHours;
     const finishingDurationHours = finishingHours + finishingMinutes / 60;
     const costs = {
         material: materialUnitCost * materialAmountInKg,
-        energy: printerPowerInKw * printDurationHours * electricityRate,
-        depreciation: machineCost / machineLifetimeHours * printDurationHours,
-        maintenance: maintenanceRatePerHour * printDurationHours,
+        energy: calculatedGrossEnergyCost,
+        depreciation: machineCost / printerLifetimeHours * printDurationHours,
+        maintenance: printerMaintenanceRate * printDurationHours,
+        consumables: printerConsumablesCost,
+        printerFixed: printerFixedCost,
         labor: finishingDurationHours * laborRate,
         packaging: packagingCost,
         overhead: monthlyExpenses / totalMonthlyPrintHours * printDurationHours
@@ -228,11 +241,11 @@ function updatePrice() {
     const productionCost = Object.values(costs).reduce((total, cost) => total + cost, 0);
     const unitCost = productionCost / (1 - failureRate / 100);
     const failureCost = unitCost - productionCost;
-    const calculatedPrice = unitCost * (1 + margin / 100) / (1 - salesFees / 100);
+    const calculatedPrice = unitCost * (1 + margin / 100) / (1 - totalSalesFees / 100);
     const unitPrice = Math.round((calculatedPrice + Number.EPSILON) * 100) / 100;
     const totalRevenue = unitPrice * quantity;
     const totalCosts = unitCost * quantity;
-    const totalProfit = totalRevenue - totalCosts - totalRevenue * salesFees / 100;
+    const totalProfit = totalRevenue - totalCosts - totalRevenue * totalSalesFees / 100;
     const materialName = materialNameInput.value.trim();
 
     document.querySelector("#unit-price").textContent = currency.format(unitPrice);
@@ -244,11 +257,101 @@ function updatePrice() {
     document.querySelector("#energy-cost").textContent = currency.format(costs.energy);
     document.querySelector("#depreciation-cost").textContent = currency.format(costs.depreciation);
     document.querySelector("#maintenance-cost").textContent = currency.format(costs.maintenance);
+    document.querySelector("#consumables-cost").textContent = currency.format(costs.consumables);
+    document.querySelector("#printer-fixed-cost-result").textContent = currency.format(costs.printerFixed);
     document.querySelector("#labor-cost").textContent = currency.format(costs.labor);
     document.querySelector("#packaging-cost-result").textContent = currency.format(costs.packaging);
     document.querySelector("#overhead-cost").textContent = currency.format(costs.overhead);
     document.querySelector("#failure-cost").textContent = currency.format(failureCost);
     document.querySelector("#unit-cost-total").textContent = currency.format(unitCost);
+}
+
+function updateEnergyCalculation() {
+    const amounts = energyInputs.map((input) => {
+        if (input.validity.badInput) {
+            return null;
+        }
+
+        const rawValue = input.value.trim();
+        if (rawValue === "") {
+            return 0;
+        }
+
+        const amount = Number(rawValue);
+        return input.validity.valid && Number.isFinite(amount) && amount >= 0 ? amount : null;
+    });
+
+    if (amounts.some((amount) => amount === null)) {
+        calculatedGrossEnergyCost = null;
+        calculatedEnergyDurationHours = null;
+        energyFormMessage.textContent = "Use valores numéricos iguais ou maiores que zero.";
+        energyGrossCost.textContent = "—";
+        energyConsumption.textContent = "—";
+        energyBaseCost.textContent = "—";
+        energyTaxCost.textContent = "—";
+        energyAdditionalResult.textContent = "—";
+        return;
+    }
+
+    const [powerWatts, days, hours, minutes, tariff, taxPercentage, additionalCost] = amounts;
+    const totalHours = days * 24 + hours + minutes / 60;
+    const consumptionKwh = powerWatts / 1000 * totalHours;
+    const baseCost = consumptionKwh * tariff;
+    const taxCost = baseCost * taxPercentage / 100;
+    const grossCost = baseCost + taxCost + additionalCost;
+
+    if (![totalHours, consumptionKwh, baseCost, taxCost, grossCost].every(Number.isFinite)) {
+        calculatedGrossEnergyCost = null;
+        calculatedEnergyDurationHours = null;
+        energyFormMessage.textContent = "Os valores informados são muito altos para calcular.";
+        energyGrossCost.textContent = "—";
+        energyConsumption.textContent = "—";
+        energyBaseCost.textContent = "—";
+        energyTaxCost.textContent = "—";
+        energyAdditionalResult.textContent = "—";
+        return;
+    }
+
+    calculatedGrossEnergyCost = grossCost;
+    calculatedEnergyDurationHours = totalHours;
+    energyFormMessage.textContent = "";
+    energyGrossCost.textContent = currency.format(grossCost);
+    energyConsumption.textContent = `${preciseEnergyQuantity.format(consumptionKwh)} kWh`;
+    energyBaseCost.textContent = currency.format(baseCost);
+    energyTaxCost.textContent = currency.format(taxCost);
+    energyAdditionalResult.textContent = currency.format(additionalCost);
+}
+
+function normalizeEnergyDuration() {
+    const timeInputs = [energyDaysInput, energyHoursInput, energyMinutesInput];
+    if (timeInputs.some((input) => input.validity.badInput)) {
+        return;
+    }
+
+    const [days, hours, minutes] = timeInputs.map((input) => (
+        input.value.trim() === "" ? 0 : Number(input.value)
+    ));
+    if (![days, hours, minutes].every(Number.isFinite) || [days, hours, minutes].some((value) => value < 0)) {
+        return;
+    }
+
+    const totalHours = hours + Math.floor(minutes / 60);
+    energyDaysInput.value = String(days + Math.floor(totalHours / 24));
+    energyHoursInput.value = String(totalHours % 24);
+    energyMinutesInput.value = String(minutes % 60);
+}
+
+function activatePrinterTab(activeTab) {
+    printerTabs.forEach((tab, index) => {
+        const isActive = tab === activeTab;
+        tab.setAttribute("aria-selected", String(isActive));
+        tab.tabIndex = isActive ? 0 : -1;
+        printerTabPanels[index].hidden = !isActive;
+    });
+    wizardWorkspace.classList.toggle(
+        "is-energy-calculator",
+        activeTab.id === "energy-calculation-tab" && activeWizardStep === 1
+    );
 }
 
 function updateWizardView() {
@@ -257,6 +360,12 @@ function updateWizardView() {
     resultsPanel.hidden = !isResultsStep;
     qrSection.hidden = !isResultsStep;
     wizardWorkspace.classList.toggle("is-results", isResultsStep);
+    wizardWorkspace.classList.toggle(
+        "is-energy-calculator",
+        !isResultsStep &&
+        activeWizardStep === 1 &&
+        printerTabs[1].getAttribute("aria-selected") === "true"
+    );
 
     wizardPanels.forEach((panel, index) => {
         panel.hidden = index !== activeWizardStep;
@@ -308,7 +417,11 @@ function validateWizardStep() {
         }
     }
 
-    const requiredFields = Array.from(currentPanel.querySelectorAll("input[required], select[required]"));
+    const requiredFields = Array.from(currentPanel.querySelectorAll("input[required], select[required]"))
+        .filter((field) => {
+            const tabPanel = field.closest('[role="tabpanel"]');
+            return !tabPanel || !tabPanel.hidden;
+        });
     const invalidField = requiredFields.find((field) => !field.checkValidity());
     if (invalidField) {
         invalidField.reportValidity();
@@ -391,44 +504,8 @@ function updateMonthlyPrintHours() {
         : String(Number(weeklyHours) * 4);
 }
 
-printMinutesInput.addEventListener("input", () => {
-    normalizeTimeInputs(printHoursInput, printMinutesInput);
-});
-
 finishingMinutesInput.addEventListener("input", () => {
     normalizeTimeInputs(finishingHoursInput, finishingMinutesInput);
-});
-
-printerPowerInput.addEventListener("input", () => {
-    const rawPower = printerPowerInput.value.trim();
-    if (rawPower === "") {
-        printerPowerInput.step = "1";
-        printerPowerUnit.textContent = "W";
-        previousPrinterPower = NaN;
-        return;
-    }
-
-    const power = Number(rawPower);
-    if (printerPowerUnit.textContent === "kW" && previousPrinterPower === 1 && power < 1) {
-        printerPowerInput.value = "999";
-        printerPowerInput.step = "1";
-        printerPowerUnit.textContent = "W";
-    } else if (printerPowerUnit.textContent === "W" && power >= 1000) {
-        printerPowerInput.value = String(power / 1000);
-        printerPowerInput.step = "0.001";
-        printerPowerUnit.textContent = "kW";
-    }
-    previousPrinterPower = Number(printerPowerInput.value);
-});
-
-printerPowerInput.addEventListener("change", () => {
-    const power = Number(printerPowerInput.value);
-    if (printerPowerUnit.textContent === "kW" && power > 0 && power < 1) {
-        printerPowerInput.value = String(Math.round(power * 1000));
-        printerPowerInput.step = "1";
-        printerPowerUnit.textContent = "W";
-    }
-    updatePrice();
 });
 
 machineCostInput.addEventListener("blur", () => {
@@ -460,7 +537,11 @@ materialAmountGramsInput.addEventListener("change", () => {
     updatePrice();
 });
 
-[laborRateInput, packagingCostInput, monthlyExpensesInput].forEach((input) => {
+[
+    laborRateInput,
+    packagingCostInput,
+    monthlyExpensesInput
+].forEach((input) => {
     input.addEventListener("input", () => {
         updateCurrencyStep(input);
     });
@@ -588,16 +669,49 @@ document.addEventListener("click", (event) => {
     }
 });
 
+printerTabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => {
+        activatePrinterTab(tab);
+    });
+
+    tab.addEventListener("keydown", (event) => {
+        let nextIndex = index;
+        if (event.key === "ArrowRight") {
+            nextIndex = (index + 1) % printerTabs.length;
+        } else if (event.key === "ArrowLeft") {
+            nextIndex = (index - 1 + printerTabs.length) % printerTabs.length;
+        } else if (event.key === "Home") {
+            nextIndex = 0;
+        } else if (event.key === "End") {
+            nextIndex = printerTabs.length - 1;
+        } else {
+            return;
+        }
+
+        event.preventDefault();
+        printerTabs[nextIndex].focus();
+        activatePrinterTab(printerTabs[nextIndex]);
+    });
+});
+
+energyCalculator.addEventListener("input", updateEnergyCalculation);
+energyDaysInput.addEventListener("input", normalizeEnergyDuration);
+energyHoursInput.addEventListener("input", normalizeEnergyDuration);
+energyMinutesInput.addEventListener("input", normalizeEnergyDuration);
+energyCalculator.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        event.preventDefault();
+    }
+});
 pricingForm.addEventListener("input", updatePrice);
 pricingForm.addEventListener("reset", () => {
     window.setTimeout(() => {
         closeMaterialPicker();
         activeWizardStep = 0;
-        printerPowerInput.step = "1";
-        printerPowerUnit.textContent = "W";
-        previousPrinterPower = Number(printerPowerInput.value);
+        activatePrinterTab(printerTabs[0]);
         updateMonthlyPrintHours();
         updateMaterialPriceFromName();
+        updateEnergyCalculation();
         updatePrice();
         updateWizardView();
     }, 0);
@@ -663,5 +777,6 @@ if (window.location.protocol === "https:" || window.location.protocol === "http:
 
 updateMonthlyPrintHours();
 updateMaterialPriceFromName();
+updateEnergyCalculation();
 updatePrice();
 updateWizardView();

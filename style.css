@@ -163,6 +163,43 @@ h1 span {
     line-height: 1.7;
 }
 
+.printer-subtabs {
+    display: flex;
+    gap: 6px;
+    margin: 0 0 16px;
+    padding: 5px;
+    background: #eaf0eb;
+    border: 1px solid rgba(29, 48, 43, 0.06);
+    border-radius: 12px;
+}
+
+.printer-subtab {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 40px;
+    padding: 8px 12px;
+    color: #64746b;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+}
+
+.printer-subtab[aria-selected="true"] {
+    color: var(--green-dark);
+    background: #fff;
+    border-color: #e1e8e3;
+    box-shadow: 0 2px 6px rgba(32, 57, 46, 0.06);
+}
+
+.printer-subtab:focus-visible {
+    outline: 2px solid #69a58a;
+    outline-offset: 2px;
+}
+
 .wizard-progress {
     max-width: 850px;
     margin: 0 auto 18px;
@@ -263,6 +300,15 @@ h1 span {
     margin-inline: auto;
 }
 
+.wizard-workspace.is-energy-calculator {
+    max-width: 1100px;
+}
+
+.wizard-workspace.is-energy-calculator .energy-results {
+    max-width: none;
+    margin-inline: 0;
+}
+
 .wizard-workspace.is-results {
     grid-template-columns: minmax(0, 1fr);
 }
@@ -319,6 +365,33 @@ h1 span {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     column-gap: 17px;
     row-gap: 18px;
+}
+
+.energy-form-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 22px;
+    row-gap: 22px;
+}
+
+.energy-workspace {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.energy-calculator .field-label {
+    font-size: 13px;
+}
+
+.energy-calculator .field input {
+    height: 52px;
+    font-size: 16px;
+}
+
+.energy-time-field {
+    grid-column: span 3;
+}
+
+.energy-tariff-field {
+    grid-column: span 2;
 }
 
 .product-field {
@@ -528,6 +601,26 @@ h1 span {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
+}
+
+.energy-time-inputs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.energy-time-inputs .unit-input {
+    padding-right: 52px;
+}
+
+.energy-time-inputs .input-suffix {
+    right: 20px;
+}
+
+.energy-results .summary-row {
+    font-size: 13px;
+}
+
+.energy-results .summary-row strong {
+    font-size: 14px;
 }
 
 .input-wrap input {
@@ -1097,6 +1190,10 @@ h1 span {
         max-width: 100%;
     }
 
+    .wizard-workspace.is-energy-calculator {
+        max-width: 100%;
+    }
+
     .calculator {
         padding-inline: 28px;
     }
@@ -1113,6 +1210,10 @@ h1 span {
 @media (max-width: 850px) {
     .form-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .energy-time-field {
+        grid-column: 1 / -1;
     }
 
     .qr-section {
@@ -1198,6 +1299,18 @@ h1 span {
     .form-grid {
         grid-template-columns: minmax(0, 1fr);
         row-gap: 14px;
+    }
+
+    .energy-time-field {
+        grid-column: auto;
+    }
+
+    .energy-tariff-field {
+        grid-column: auto;
+    }
+
+    .energy-time-inputs {
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .product-field {

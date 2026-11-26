@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#f5f7f4">
-    <meta name="description" content="Calcule o preço de venda de peças impressas em 3D considerando material, energia, máquina, mão de obra e taxas.">
+    <meta name="description" content="Calcule o preço de peças impressas em 3D ou o custo bruto de energia com a ferramenta Preço Certo.">
     <title>Preço Certo — Precificação para impressão 3D</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,7 +30,7 @@
         <section class="intro" aria-labelledby="page-title">
             <p class="eyebrow"><span class="eyebrow-line"></span> EMPREENDEDORISMO NA PRÁTICA</p>
             <h1 id="page-title">Seu trabalho tem valor.<br><span>Seu preço também.</span></h1>
-            <p class="intro-copy">Calcule o preço de cada peça considerando material, energia, máquina, mão de obra e outros custos da impressão.</p>
+            <p class="intro-copy">Calcule o preço de cada peça ou estime o custo bruto de energia com uma ferramenta simples e rápida.</p>
         </section>
 
         <nav class="wizard-progress" id="wizard-progress" aria-label="Etapas da precificação">
@@ -170,7 +170,107 @@
                 </fieldset>
 
                 <fieldset class="cost-group wizard-panel" data-wizard-step="1" tabindex="-1" hidden>
-                    <legend><span>2</span> Impressora e manutenção</legend>
+                        <legend><span>2</span> Impressora e manutenção</legend>
+                        <div class="printer-subtabs" role="tablist" aria-label="Opções de impressora">
+                            <button class="printer-subtab" id="printer-costs-tab" type="button" role="tab" aria-selected="true" aria-controls="printer-costs-panel" tabindex="0">Custos da impressão 3D</button>
+                            <button class="printer-subtab" id="energy-calculation-tab" type="button" role="tab" aria-selected="false" aria-controls="energy-calculation-panel" tabindex="-1">Cálculo de Energia Bruta</button>
+                        </div>
+                        <div class="workspace energy-workspace printer-step-panel" id="energy-calculation-panel" role="tabpanel" aria-labelledby="energy-calculation-tab" tabindex="0" hidden>
+                            <div class="calculator card energy-calculator" id="energy-calculator">
+                                <div class="card-heading">
+                                    <div>
+                                        <p class="section-kicker">ENERGIA</p>
+                                        <h2>Cálculo de Energia Bruta</h2>
+                                    </div>
+                                    <span class="heading-icon" aria-hidden="true">
+                                        <svg viewBox="0 0 24 24" fill="none">
+                                            <path d="M13.5 2.8 5.8 13h5.1l-.5 8.2L18.2 11h-5.1l.4-8.2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </span>
+                                </div>
+
+                                <div class="form-grid energy-form-grid">
+                                    <label class="field" for="energy-power">
+                                        <span class="field-label">Potência</span>
+                                        <span class="input-wrap">
+                                            <input class="unit-input" id="energy-power" name="energyPower" type="number" min="0" step="any" value="120" inputmode="decimal" placeholder="0">
+                                            <span class="input-suffix">W</span>
+                                        </span>
+                                    </label>
+                                    <div class="field energy-time-field">
+                                        <span class="field-label">Tempo de uso</span>
+                                        <div class="time-inputs energy-time-inputs">
+                                            <label class="input-wrap" for="energy-days">
+                                                <span class="sr-only">Dias de uso</span>
+                                                <input class="unit-input" id="energy-days" name="energyDays" type="number" min="0" step="any" value="0" inputmode="decimal" placeholder="0">
+                                                <span class="input-suffix">dias</span>
+                                            </label>
+                                            <label class="input-wrap" for="energy-hours">
+                                                <span class="sr-only">Horas de uso</span>
+                                                <input class="unit-input" id="energy-hours" name="energyHours" type="number" min="0" step="any" value="2" inputmode="decimal" placeholder="0">
+                                                <span class="input-suffix">h</span>
+                                            </label>
+                                            <label class="input-wrap" for="energy-minutes">
+                                                <span class="sr-only">Minutos de uso</span>
+                                                <input class="unit-input" id="energy-minutes" name="energyMinutes" type="number" min="0" step="any" value="0" inputmode="decimal" placeholder="0">
+                                                <span class="input-suffix">min</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <label class="field energy-tariff-field" for="energy-tariff">
+                                        <span class="field-label">Tarifa de energia (R$/kWh)</span>
+                                        <span class="input-wrap">
+                                            <span class="input-prefix">R$</span>
+                                            <input class="currency-input" id="energy-tariff" name="energyTariff" type="number" min="0" step="any" value="1" inputmode="decimal" placeholder="0,00">
+                                        </span>
+                                    </label>
+                                    <label class="field" for="energy-tax">
+                                        <span class="field-label">Tributos <span class="optional">(opcional)</span></span>
+                                        <span class="input-wrap">
+                                            <input class="unit-input" id="energy-tax" name="energyTax" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
+                                            <span class="input-suffix">%</span>
+                                        </span>
+                                    </label>
+                                    <label class="field" for="energy-additional-cost">
+                                        <span class="field-label">Adicionais fixos <span class="optional">(opcional)</span></span>
+                                        <span class="input-wrap">
+                                            <span class="input-prefix">R$</span>
+                                            <input class="currency-input" id="energy-additional-cost" name="energyAdditionalCost" type="number" min="0" step="any" inputmode="decimal" placeholder="0,00">
+                                        </span>
+                                    </label>
+                                </div>
+                                <p class="form-message energy-form-message" id="energy-form-message" role="status" aria-live="polite"></p>
+                            </div>
+
+                            <aside class="results card energy-results" aria-labelledby="energy-result-title">
+                                <div class="result-topline">
+                                    <p class="section-kicker">RESULTADO AO VIVO</p>
+                                    <span class="live-badge"><span></span> AO VIVO</span>
+                                </div>
+                                <h2 id="energy-result-title">Custo bruto final</h2>
+                                <p class="price-value" id="energy-gross-cost" aria-live="polite">R$ 0,00</p>
+                                <p class="price-caption">custo total da energia</p>
+                                <div class="result-divider"></div>
+                                <div class="summary-row">
+                                    <span>Consumo total</span>
+                                    <strong id="energy-consumption">0 kWh</strong>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Custo base</span>
+                                    <strong id="energy-base-cost">R$ 0,00</strong>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Tributos</span>
+                                    <strong id="energy-tax-cost">R$ 0,00</strong>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Adicionais fixos</span>
+                                    <strong id="energy-additional-result">R$ 0,00</strong>
+                                </div>
+                                <p class="result-footnote">Valor bruto = custo base + tributos sobre o custo base + adicionais fixos.</p>
+                            </aside>
+                        </div>
+                    <div class="printer-step-panel" id="printer-costs-panel" role="tabpanel" aria-labelledby="printer-costs-tab" tabindex="0">
                     <div class="form-grid">
                         <label class="field" for="printer-type">
                             <span class="field-label">Tipo de impressora</span>
@@ -181,38 +281,6 @@
                             </select>
                             <span class="field-hint">Selecione a tecnologia da impressora</span>
                         </label>
-                        <label class="field" for="printer-power">
-                            <span class="field-label">Potência média da impressora</span>
-                            <span class="input-wrap">
-                                <input class="unit-input" id="printer-power" name="printerPower" type="number" min="0" step="1" value="120" inputmode="decimal" required>
-                                <span class="input-suffix" id="printer-power-unit">W</span>
-                            </span>
-                            <span class="field-hint" id="printer-energy-per-hour">Consumo por hora: 0,12 kWh</span>
-                        </label>
-                        <div class="field time-field">
-                            <span class="field-label">Tempo de impressão</span>
-                            <div class="time-inputs">
-                                <label class="input-wrap" for="print-hours">
-                                    <span class="sr-only">Horas de impressão</span>
-                                    <input class="unit-input" id="print-hours" name="printHours" type="number" min="0" step="1" value="2" inputmode="numeric" required>
-                                    <span class="input-suffix">h</span>
-                                </label>
-                                <label class="input-wrap" for="print-minutes">
-                                    <span class="sr-only">Minutos de impressão</span>
-                                    <input class="unit-input" id="print-minutes" name="printMinutes" type="number" min="0" step="1" value="0" inputmode="numeric" required>
-                                    <span class="input-suffix">min</span>
-                                </label>
-                            </div>
-                            <span class="field-hint">Ao chegar a 60 min, soma 1 h automaticamente</span>
-                        </div>
-                        <label class="field" for="electricity-rate">
-                            <span class="field-label">Tarifa de energia</span>
-                            <span class="input-wrap">
-                                <span class="input-prefix">R$</span>
-                                <input class="currency-input" id="electricity-rate" name="electricityRate" type="number" min="0" step="0.01" value="1" inputmode="decimal" required>
-                            </span>
-                            <span class="field-hint">Valor base de R$ 1,00/kWh; ajuste à sua conta de luz</span>
-                        </label>
                         <label class="field" for="machine-cost">
                             <span class="field-label">Valor da impressora</span>
                             <span class="input-wrap">
@@ -221,6 +289,36 @@
                             </span>
                             <span class="field-hint">Aumento e redução pelas setas em passos de R$ 10,00</span>
                         </label>
+                        <label class="field" for="printer-lifetime-hours">
+                            <span class="field-label">Vida útil da impressora</span>
+                            <span class="input-wrap">
+                                <input class="unit-input" id="printer-lifetime-hours" name="printerLifetimeHours" type="number" min="0" step="1" value="5000" inputmode="numeric" required>
+                                <span class="input-suffix">horas</span>
+                            </span>
+                            <span class="field-hint">Usada para calcular a depreciação por impressão</span>
+                        </label>
+                        <label class="field" for="printer-maintenance-rate">
+                            <span class="field-label">Manutenção (R$/h)</span>
+                            <span class="input-wrap">
+                                <span class="input-prefix">R$</span>
+                                <input class="currency-input" id="printer-maintenance-rate" name="printerMaintenanceRate" type="number" min="0" step="0.01" value="0.5" inputmode="decimal" required>
+                            </span>
+                        </label>
+                        <label class="field" for="printer-consumables-cost">
+                            <span class="field-label">Peças e consumíveis extras (R$/peça)</span>
+                            <span class="input-wrap">
+                                <span class="input-prefix">R$</span>
+                                <input class="currency-input" id="printer-consumables-cost" name="printerConsumablesCost" type="number" min="0" step="0.01" value="0" inputmode="decimal" required>
+                            </span>
+                        </label>
+                        <label class="field" for="printer-fixed-cost">
+                            <span class="field-label">Outros custos fixos da impressora (R$/peça)</span>
+                            <span class="input-wrap">
+                                <span class="input-prefix">R$</span>
+                                <input class="currency-input" id="printer-fixed-cost" name="printerFixedCost" type="number" min="0" step="0.01" value="0" inputmode="decimal" required>
+                            </span>
+                        </label>
+                    </div>
                     </div>
                 </fieldset>
 
@@ -307,6 +405,14 @@
                             </span>
                             <span class="field-hint">Taxas calculadas sobre o valor da venda</span>
                         </label>
+                        <label class="field" for="platform-fee">
+                            <span class="field-label">Taxa de plataforma (%)</span>
+                            <span class="input-wrap">
+                                <input class="unit-input" id="platform-fee" name="platformFee" type="number" min="0" max="100" step="0.1" value="0" inputmode="decimal" required>
+                                <span class="input-suffix">%</span>
+                            </span>
+                            <span class="field-hint">Percentual cobrado pela plataforma sobre a venda</span>
+                        </label>
                         <label class="field" for="quantity">
                             <span class="field-label">Peças nesta simulação</span>
                             <span class="input-wrap">
@@ -359,7 +465,9 @@
                         <div><span>Material</span><strong id="material-cost">R$ 0,00</strong></div>
                         <div><span>Energia elétrica</span><strong id="energy-cost">R$ 0,00</strong></div>
                         <div><span>Depreciação da máquina</span><strong id="depreciation-cost">R$ 0,00</strong></div>
-                        <div><span>Peças e manutenção</span><strong id="maintenance-cost">R$ 0,00</strong></div>
+                        <div><span>Manutenção da impressora</span><strong id="maintenance-cost">R$ 0,00</strong></div>
+                        <div><span>Peças e consumíveis extras</span><strong id="consumables-cost">R$ 0,00</strong></div>
+                        <div><span>Outros custos fixos da impressora</span><strong id="printer-fixed-cost-result">R$ 0,00</strong></div>
                         <div><span>Mão de obra</span><strong id="labor-cost">R$ 0,00</strong></div>
                         <div><span>Embalagem e envio</span><strong id="packaging-cost-result">R$ 0,00</strong></div>
                         <div><span>Despesas fixas rateadas</span><strong id="overhead-cost">R$ 0,00</strong></div>
@@ -374,7 +482,7 @@
                     </div>
                     <strong id="total-profit">R$ 334,56</strong>
                 </div>
-                <p class="result-footnote">Estimativa por peça: material, energia, depreciação, manutenção, trabalho, embalagem e despesas rateadas. Ajuste os valores à sua realidade.</p>
+                <p class="result-footnote">Estimativa por peça: material, energia bruta, depreciação, manutenção, consumíveis extras, custos fixos, trabalho, embalagem e despesas rateadas. Ajuste os valores à sua realidade.</p>
                 <section class="examples-panel" aria-labelledby="examples-title">
                     <p class="examples-kicker">EXEMPLOS PRÁTICOS</p>
                     <h3 id="examples-title">Como chegar aos valores</h3>
